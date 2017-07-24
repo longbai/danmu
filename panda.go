@@ -177,6 +177,10 @@ func (p *Panda) dealBuffer(buff []byte) int {
 		var n = 0
 		for {
 			n = bytes.LastIndex(strBytes, typeStart)
+			if n == -1 {
+				fmt.Println("invalid string", string(strBytes))
+				break
+			}
 			str := string(strBytes[n:])
 			p.pool <- &str
 			if n == 0 {

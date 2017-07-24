@@ -17,6 +17,14 @@ func main() {
 	fmt.Println(err)
 
 	for x := range ch {
-		fmt.Println(*x)
+		msg, err := danmu.PandaMessageParse(*x)
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			if msg.Type() == danmu.PandaText {
+				msgText := msg.(*danmu.PandaTextMessage)
+				fmt.Println(msgText.Data.User.NickName, "说:", msgText.Data.Content)
+			}
+		}
 	}
 }
