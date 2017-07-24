@@ -178,8 +178,13 @@ func (p *Panda) dealBuffer(buff []byte) int {
 		for {
 			n = bytes.LastIndex(strBytes, typeStart)
 			if n == -1 {
-				fmt.Println("invalid string", string(strBytes))
-				break
+				// for ugly string like
+				// {"data":{"content":{"val":5819.173616,"c_lv":14,"c_lv_val":5180,"n_lv":15,"n_lv_val":6449},"to":{"toRoom":"66666"},"from":{}},"type":"212"}
+				n = bytes.LastIndex(strBytes, []byte(`{"data"`))
+				if n == -1 {
+					fmt.Println("invalid string", string(strBytes))
+					break
+				}
 			}
 			str := string(strBytes[n:])
 			p.pool <- &str

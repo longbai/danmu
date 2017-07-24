@@ -2,6 +2,7 @@ package danmu
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
 	"strings"
 )
@@ -11,8 +12,12 @@ const (
 	PandaBamboo       = 206
 	PandaVisitor      = 207
 	PandaVisitorTotal = 205
-	PandaGift         = 306
-	PandaGiftOther    = 311
+	// {"type":"208","time":1500912002,"data":{"from":{"rid":"-1"},"to":{"toroom":"66666"},"content":"724236818"}}
+	PandaLv        = 212 //what mean
+	PandaGift      = 306
+	PandaGiftOther = 311
+	// {"type":"331","time":1500911936,"data":{"from":{"avatar":"undefined","nickName":"抹茶pocky","rid":"92752200"},"to":{"nickName":"宅小兔vv","rid":"86787262","toroom":"0","xid":"7332995"},"content":{"combo":"1","count":"1","id":"58f0ac09af2219694f08bb12","name":"流星雨"}}}
+	PandaGift2 = 331
 )
 
 type PandaUser struct {
@@ -107,8 +112,8 @@ type PandaVisitorMessage struct {
 }
 
 type PandaVisitorTotalContent struct {
-	ShowNum int64 `json:"show_num"`
-	Total   int64 `json:"total"`
+	ShowNum int64   `json:"show_num"`
+	Total   float64 `json:"total"`
 }
 
 type PandaVisitorTotalData struct {
@@ -190,6 +195,26 @@ type PandaGiftOtherMessage struct {
 	Data PandaGiftOtherData `json:"data"`
 }
 
+//{"data":{"content":{"val":5819.173616,"c_lv":14,"c_lv_val":5180,"n_lv":15,"n_lv_val":6449},"to":{"toRoom":"66666"},"from":{}},"type":"212"}
+
+type PandaLvContent struct {
+	Value    float64 `json:"val"`
+	CLv      int64   `json:"c_lv"`
+	cLvValue int64   `json:"c_lv_val"`
+	NLv      int64   `json:"n_lv"`
+	NLvValue int64   `json:"n_lv_val"`
+}
+
+type PandaLvData struct {
+	Content PandaLvContent     `json:"content"`
+	User    PandaUser          `json:"from"`
+	Room    PandaMessageToRoom `json:"to"`
+}
+
+type PandaLvMessage struct {
+	Data PandaLvData `json:"data"`
+}
+
 func (p *PandaTextMessage) Type() int {
 	return PandaText
 }
@@ -212,6 +237,10 @@ func (p *PandaVisitorMessage) Type() int {
 
 func (p *PandaVisitorTotalMessage) Type() int {
 	return PandaVisitorTotal
+}
+
+func (p *PandaLvMessage) Type() int {
+	return PandaLv
 }
 
 func (p *PandaUnknownMessage) Type() int {
@@ -271,6 +300,7 @@ func PandaMessageParse(str string) (Message, error) {
 		if err != nil {
 			return nil, err
 		}
+		fmt.Println("unknown message ", msg.Type(), str)
 		return &msg, nil
 	}
 }
