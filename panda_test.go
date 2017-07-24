@@ -6,8 +6,9 @@ import (
 )
 
 func TestPandaLiveStatus(t *testing.T) {
-	p := Panda{66666, nil}
-	b, err := p.GetLiveStatus()
+	p, err := newPanda("http://www.pandatv.com/66666")
+	fmt.Println("xxxxx", p, err)
+	b, err := p.IsLive()
 	if err != nil {
 		fmt.Println(err)
 		t.Fail()
@@ -16,15 +17,15 @@ func TestPandaLiveStatus(t *testing.T) {
 }
 
 func TestPandaNoRoomLiveStatus(t *testing.T) {
-	p := Panda{6666677777777, nil}
-	_, err := p.GetLiveStatus()
+	p, _ := newPanda("http://www.pandatv.com/66666777777")
+	_, err := p.IsLive()
 	if err == nil {
 		t.Fail()
 	}
 }
 
 func TestPandaChatParam(t *testing.T) {
-	p := Panda{66666, nil}
+	p, _ := newPanda("http://www.pandatv.com/66666")
 	param, err := p.getChatParam()
 	if err != nil {
 		fmt.Println(err)
