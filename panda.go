@@ -2,6 +2,7 @@ package danmu
 
 import (
 	"bytes"
+	"encoding/binary"
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -118,7 +119,8 @@ func (p *Panda) handshake(param *PandaChatParam) error {
 
 	msg := make([]byte, 4+2+l)
 	copy(msg, pandaStart)
-	copy(msg[4:], []byte{byte(l >> 8), byte(l & 0xff)})
+	binary.BigEndian.PutUint16(msg[4:], uint16(l))
+	// copy(msg[4:], []byte{byte(l >> 8), byte(l & 0xff)})
 	copy(msg[4+2:], []byte(data))
 	_, err := p.conn.Write(msg)
 	if err != nil {
@@ -152,22 +154,24 @@ func (p *Panda) keepAlive() {
 var typeStart = []byte(`{"type"`)
 
 func (p *Panda) dealBuffer(buff []byte) int {
-	if len(buff) <= 4 {
+	l := len(buff)
+	if l <= 4 {
 		return 0 // no deal
 	}
 
 	if bytes.Equal(buff[:4], pandaReceiveMsg) {
-		if len(buff) < 4+2 { // msg length + body not enough, wait next
+		if l < 4+2 { // msg length + body not enough, wait next
 			return 0
 		}
 		length := uint(buff[4]<<8) + uint(buff[5])
 		pos := int(4 + 2 + length)
-		if len(buff) < pos+4+pandaIgnoreByteLength {
+		if l < pos+4+pandaIgnoreByteLength {
 			return 0
 		}
 
-		msgLen := int((uint(buff[pos]) << 24) + (uint(buff[pos+1]) << 16) + (uint(buff[pos+2]) << 8) + uint(buff[pos+3]))
-		if len(buff) < pos+4+msgLen {
+		// msgLen := int((uint(buff[pos]) << 24) + (uint(buff[pos+1]) << 16) + (uint(buff[pos+2]) << 8) + uint(buff[pos+3]))
+		msgLen := int(binary.BigEndian.Uint32(buff[pos:]))
+		if l < pos+4+msgLen {
 			return 0
 		}
 		pos += 4 + pandaIgnoreByteLength
