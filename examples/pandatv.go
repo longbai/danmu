@@ -1,13 +1,15 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+
 	"github.com/longbai/danmu"
 	// "time"
 )
 
 func main() {
-	p, _ := danmu.NewPanda("https://www.panda.tv/66666")
+	p, _ := danmu.NewPanda("https://www.panda.tv/135069")
 	b, err := p.IsLive()
 	if err != nil {
 		fmt.Println(err)
@@ -19,11 +21,13 @@ func main() {
 	for x := range ch {
 		msg, err := danmu.PandaMessageParse(*x)
 		if err != nil {
-			fmt.Println(err)
+			// fmt.Println(err)
 		} else {
 			if msg.Type() == danmu.PandaText {
 				msgText := msg.(*danmu.PandaTextMessage)
-				fmt.Println(msgText.Data.User.NickName, "说:", msgText.Data.Content)
+				// fmt.Printf("\"%s\",\"%s\"\n", msgText.Data.User.NickName, msgText.Data.Content)
+				x, _ := json.Marshal(msgText)
+				fmt.Println(string(x))
 			}
 		}
 	}

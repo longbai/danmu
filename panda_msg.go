@@ -2,7 +2,7 @@ package danmu
 
 import (
 	"encoding/json"
-	"fmt"
+	// "fmt"
 	"strconv"
 	"strings"
 )
@@ -300,7 +300,7 @@ func PandaMessageParse(str string) (Message, error) {
 		if err != nil {
 			return nil, err
 		}
-		fmt.Println("unknown message ", msg.Type(), str)
+		// fmt.Println("unknown message ", msg.Type(), str)
 		return &msg, nil
 	}
 }
